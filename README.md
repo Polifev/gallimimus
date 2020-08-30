@@ -7,7 +7,7 @@ Gallimimus is a very light library for binding a javascript object (the model) t
 You can install the gallimimus project with ``npm`` :
 
 ```
-npm install --save @polifev/galimimus
+npm install --save @polifev/gallimimus
 ```
 
 Then you can require it from your application code :
@@ -71,8 +71,7 @@ let model = {
     }
 };
 
-document.addEventListener("load", () => {
-    "readystatechange", () => {
+document.addEventListener("readystatechange", () => {
 	if (document.readyState === "complete") {
 		let gallimimus = new Gallimimus();
         gallimimus.load(
@@ -81,7 +80,7 @@ document.addEventListener("load", () => {
             model		// The model that you will bind with your template
         );
 	}
-};
+});
 ```
 
 Now that these files are created, you will need to build your app with browserify :

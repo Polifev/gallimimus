@@ -3,7 +3,7 @@ const { AbstractDirectiveResolver } = require("./AbstractDirectiveResolver");
 
 const ELEMENT_MARKER = "$elt";
 
-export class ForeachResolver extends AbstractDirectiveResolver {
+class ForeachResolver extends AbstractDirectiveResolver {
 
 	/**
 	 * Constructor

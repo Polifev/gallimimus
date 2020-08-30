@@ -1,6 +1,6 @@
 const { AbstractDirectiveResolver } = require("./AbstractDirectiveResolver");
 
-export class ComponentsResolver extends AbstractDirectiveResolver {
+class ComponentsResolver extends AbstractDirectiveResolver {
 
 	/**
 	 * Constructor
