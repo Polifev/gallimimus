@@ -2,10 +2,6 @@
 
 Gallimimus is a very light library for binding a javascript object (the model) to an html document (the template). It relies on the [on-change](https://www.npmjs.com/package/on-change) module to provide a bidirectional, dirty checking free data binding.
 
-## Table of contents
-
-[TOC]
-
 ## Quick start
 
 In this section, you'll learn how to setup a little project with Gallimimus and to run it into your browser.
