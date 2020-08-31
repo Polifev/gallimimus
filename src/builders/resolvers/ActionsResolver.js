@@ -54,7 +54,9 @@ class ActionsResolver extends AbstractDirectiveResolver {
                 let functionName = binding.path.substring(pointIndex + 1);
                 let parent = findProperty(model, parentPath);
                 let functionArguments = binding.arguments.map(argumentPath => findProperty(model, argumentPath));
-                parent[functionName].apply(parent, functionArguments);
+                if (parent[functionName] !== undefined) {
+                    parent[functionName].apply(parent, functionArguments);
+                }
             }
         };
         this._actions.push(action);
