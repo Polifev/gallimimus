@@ -13,8 +13,12 @@ describe("ActionsResolver", () => {
         </head>
         <body>
 			<div id="app">
-				<button id="btn" data-action="foo"></button>
+				<button id="btn" data-action="foo">Ok</button>
 				<input id="input" data-action="foo,change" />
+				<input id="dblBindInput" data-action="foo,click;bar,change" />
+				<input id="dblBindInputSame" data-action="foo,click;foo,change" />
+				<button id="dblActionButton" data-action="foo;bar">Yo</button>
+				<button id="argsButton" data-action="foo,click,x,z;">Yo</button>
 			</div>
         </body>
         </html>
@@ -32,12 +36,12 @@ describe("ActionsResolver", () => {
 		};
 
 		let resolver = new ActionsResolver();
-		resolver.resolve(document.getElementById("app"), model);
-		document.addEventListener("click", e => resolver.userAction(e));
+		resolver.resolve(global.document.getElementById("app"), model);
+		global.document.addEventListener("click", e => resolver.userAction(e));
 
-		let evt = document.createEvent("MouseEvents");
+		let evt = global.document.createEvent("MouseEvents");
 		evt.initEvent("click", true, false);
-		document.getElementById("btn").dispatchEvent(evt);
+		global.document.getElementById("btn").dispatchEvent(evt);
 
 		assert.equal(callCount, 1);
 	});
@@ -51,13 +55,13 @@ describe("ActionsResolver", () => {
 		};
 
 		let resolver = new ActionsResolver();
-		resolver.resolve(document.getElementById("app"), model);
-		document.addEventListener("click", e => resolver.userAction(e));
-		document.addEventListener("change", e => resolver.userAction(e));
+		resolver.resolve(global.document.getElementById("app"), model);
+		global.document.addEventListener("click", e => resolver.userAction(e));
+		global.document.addEventListener("change", e => resolver.userAction(e));
 
-		let evt = document.createEvent("Event");
+		let evt = global.document.createEvent("Event");
 		evt.initEvent("change", true, false);
-		document.getElementById("input").dispatchEvent(evt);
+		global.document.getElementById("input").dispatchEvent(evt);
 
 		assert.equal(callCount, 1);
 	});
@@ -72,14 +76,132 @@ describe("ActionsResolver", () => {
 		};
 
 		let resolver = new ActionsResolver();
-		resolver.resolve(document.getElementById("app"), model);
-		document.addEventListener("click", e => resolver.userAction(e));
-		document.addEventListener("change", e => resolver.userAction(e));
+		resolver.resolve(global.document.getElementById("app"), model);
+		global.document.addEventListener("click", e => resolver.userAction(e));
+		global.document.addEventListener("change", e => resolver.userAction(e));
 
-		let evt = document.createEvent("Event");
+		let evt = global.document.createEvent("Event");
 		evt.initEvent("change", true, false);
-		document.getElementById("input").dispatchEvent(evt);
+		global.document.getElementById("input").dispatchEvent(evt);
 
 		assert.equal(r, 42);
+	});
+
+	it("can have multiple binding for different actions", () => {
+		let fooCount = 0;
+		let barCount = 0;
+		let model = {
+			foo() {
+				fooCount++;
+			},
+			bar() {
+				barCount++;
+			}
+		};
+
+		let resolver = new ActionsResolver();
+		resolver.resolve(global.document.getElementById("app"), model);
+		global.document.addEventListener("click", e => resolver.userAction(e));
+		global.document.addEventListener("change", e => resolver.userAction(e));
+
+		let evt1 = global.document.createEvent("MouseEvent");
+		evt1.initEvent("click", true, false);
+		global.document.getElementById("dblBindInput").dispatchEvent(evt1);
+		assert.equal(fooCount, 1);
+		assert.equal(barCount, 0);
+		let evt2 = global.document.createEvent("Event");
+		evt2.initEvent("change", true, false);
+		global.document.getElementById("dblBindInput").dispatchEvent(evt2);
+		assert.equal(fooCount, 1);
+		assert.equal(barCount, 1);
+	});
+
+	it("can have multiple binding for the same action", () => {
+		let fooCount = 0;
+		let model = {
+			foo() {
+				fooCount++;
+			}
+		};
+
+		let resolver = new ActionsResolver();
+		resolver.resolve(global.document.getElementById("app"), model);
+		global.document.addEventListener("click", e => resolver.userAction(e));
+		global.document.addEventListener("change", e => resolver.userAction(e));
+
+		let evt1 = global.document.createEvent("MouseEvent");
+		evt1.initEvent("click", true, false);
+		global.document.getElementById("dblBindInputSame").dispatchEvent(evt1);
+		assert.equal(fooCount, 1);
+		let evt2 = global.document.createEvent("Event");
+		evt2.initEvent("change", true, false);
+		global.document.getElementById("dblBindInputSame").dispatchEvent(evt2);
+		assert.equal(fooCount, 2);
+	});
+
+	it("can have the same binding for two different actions", () => {
+		let fooCount = 0;
+		let barCount = 0;
+		let model = {
+			foo() {
+				fooCount++;
+			},
+			bar() {
+				barCount++;
+			}
+		};
+
+		let resolver = new ActionsResolver();
+		resolver.resolve(global.document.getElementById("app"), model);
+		global.document.addEventListener("click", e => resolver.userAction(e));
+		global.document.addEventListener("change", e => resolver.userAction(e));
+
+		let evt1 = global.document.createEvent("MouseEvent");
+		evt1.initEvent("click", true, false);
+		global.document.getElementById("dblActionButton").dispatchEvent(evt1);
+		assert.equal(fooCount, 1);
+		assert.equal(barCount, 1);
+	});
+
+	it("can make use of arguments", () => {
+		let r = 0;
+		let model = {
+			x: 7,
+			z: 12,
+			foo(a, b) {
+				r = a + b;
+			}
+		};
+
+		let resolver = new ActionsResolver();
+		resolver.resolve(global.document.getElementById("app"), model);
+		global.document.addEventListener("click", e => resolver.userAction(e));
+		global.document.addEventListener("change", e => resolver.userAction(e));
+
+		let evt1 = global.document.createEvent("MouseEvent");
+		evt1.initEvent("click", true, false);
+		global.document.getElementById("argsButton").dispatchEvent(evt1);
+		assert.equal(r, 19);
+	});
+
+	it("can make use of complex arguments", () => {
+		let r = 0;
+		let model = {
+			x: [7, 2, 8],
+			z: { add: 3, multiply: 2 },
+			foo(list, obj) {
+				r = list.map(n => n * obj.multiply + obj.add);
+			}
+		};
+
+		let resolver = new ActionsResolver();
+		resolver.resolve(global.document.getElementById("app"), model);
+		global.document.addEventListener("click", e => resolver.userAction(e));
+		global.document.addEventListener("change", e => resolver.userAction(e));
+
+		let evt1 = global.document.createEvent("MouseEvent");
+		evt1.initEvent("click", true, false);
+		global.document.getElementById("argsButton").dispatchEvent(evt1);
+		assert.deepEqual(r, [17, 7, 19]);
 	});
 });
