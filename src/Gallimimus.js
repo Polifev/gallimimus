@@ -4,6 +4,7 @@ const { IfElseResolver } = require("./builders/resolvers/IfElseResolver");
 const { BindResolver } = require("./builders/resolvers/BindResolver");
 const { ActionsResolver } = require("./builders/resolvers/ActionsResolver");
 const { ComponentsResolver } = require("./builders/resolvers/ComponentsResolver");
+const { Component } = require("./Component");
 const onChange = require("on-change");
 
 class Gallimimus {
@@ -74,4 +75,6 @@ class Gallimimus {
 	}
 }
 
+// Exports
 module.exports.Gallimimus = Gallimimus;
+module.exports.Component = Component;
