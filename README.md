@@ -105,7 +105,7 @@ Directives are custom arguments that will be used to describe how the data shoul
 
 #### Usage
 
-The first thing that you'll probably want to use in your application is a way of showing (and maybe editing) the content of the scalar values of your model. That's where *data-bind* directive comes in action. Let's take a look at a basic example :
+The first thing that you'll probably want to use in your application is a way of showing (and maybe editing) the content of the scalar values of your model. That's where *data-bind* directive comes in action. Let's have a look at a basic example :
 
 ```html
 <p>Hello <span data-bind="user.firstname"></span></p>
@@ -125,13 +125,14 @@ You can try to combine the two examples above in the same template. You'll see t
 
 #### Syntax
 
-A data-bind attribute is written like this:  ``[path](,[bind-mode](,[target-property]))``. You can bind multiple properties to multiple values by separating them with semicolons.
+A *data-bind* attribute is written like this:  ``[path](,[bind-mode](,[target-property](,[compute-args])))``. You can bind multiple properties to multiple values by separating them with semicolons.
 
-|        name         |                      description                       | default value |
-| :-----------------: | :----------------------------------------------------: | :-----------: |
-|      ``path``       |     A path to the value to be bound in your model      |       -       |
-|    ``bind-mode``    |  Either ``oneway``, ``twoways`` or ``onewaytosource``  |  ``oneway``   |
-| ``target-property`` | The property of the html element that you want to bind | ``innerHTML`` |
+|        name         |                         description                          | default value |
+| :-----------------: | :----------------------------------------------------------: | :-----------: |
+|      ``path``       |        A path to the value to be bound in your model         |       -       |
+|    ``bind-mode``    |     Either ``oneway``, ``twoways`` or ``onewaytosource``     |  ``oneway``   |
+| ``target-property`` |    The property of the html element that you want to bind    | ``innerHTML`` |
+|  ``compute-args``   | A list of paths to values that should also trigger an update when modified. It is mainly used for computed properties with get operator. |       -       |
 
 #### Binding modes
 
@@ -143,7 +144,42 @@ A data-bind attribute is written like this:  ``[path](,[bind-mode](,[target-prop
 
 #### Notes
 
-* The data-bind directive does not imply any page rebuild.
+* The *data-bind* directive does not imply any page rebuild.
+* The model is updated by listening to ``input`` and ``change`` events of the html elements
+
+### data-action
+
+#### Usage
+
+Binding values are ok but can we now bind method calls to some events of our app ? This is done with the *data-action* directive. Let's have a look at an example :
+
+```html
+<button data-action="greetings">Click me</button>
+```
+
+You'll notice that the syntax is pretty straightforward. With this code, Gallimimus will search for a function named ``greetings`` at the root of your model and bind it to the ``click`` event of the button.
+
+Let's now take an example that is a bit more complex :
+
+```html
+<input data-action="validator.validate,change,user.firstname" />
+```
+
+Here, we precise that we want the action to be triggered with the event ``change`` of the ``<input>``. We also give the function ``yourModel.validator.validate`` an argument. This argument will have the value of ``yourModel.user.firstname``. You can pass as much arguments as you want by putting them at the end of the declaration.
+
+#### Syntax
+
+A *data-action* attribute is written like this:  ``[path](,[event-name](,[args]))``. You can bind multiple events to multiple actions by separating them with semicolons, just as with the *data-bind* attribute. Don't be afraid to bind the same event to several actions but be aware that the order in which they will be called is not guaranteed to be the same as the order in which they are declared.
+
+|      name      |                         description                          | default value |
+| :------------: | :----------------------------------------------------------: | :-----------: |
+|    ``path``    |        A path to the method to be bound in your model        |       -       |
+| ``event-name`` |          The event that will linked to your action           |   ``click``   |
+|    ``args``    | A comma-separated list of paths to values in the model that you want to provide as arguments to the action. |       -       |
+
+#### Notes
+
+/
 
 ### data-if & data-else
 
