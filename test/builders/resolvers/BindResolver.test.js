@@ -17,6 +17,8 @@ describe("BindResolver", () => {
 				<input id="input1" data-bind="foo,twoways,value" />
 				<input id="input2" data-bind="foo,onewaytosource,value" />
 				<input id="input3" data-bind="foo,oneway,value" />
+				<span id="computed" data-bind="foo,oneway,innerHTML,bar"></span>
+				<span data-bind="foo,oneway,innerHTML;bar,oneway,id"></span>
 			</div>
         </body>
         </html>
@@ -27,42 +29,45 @@ describe("BindResolver", () => {
 
 	it("inits the value in the bound attribute only if bindmode permit it", () => {
 		let model = {
-			foo: "Hello world"
+			foo: "Hello world",
+			bar: "oops"
 		};
 		let resolver = new BindResolver();
-		resolver.resolve(document.getElementById("app"), model);
-		assert.equal(document.getElementById("span").innerHTML, model.foo);
-		assert.equal(document.getElementById("input1").value, model.foo);
-		assert.equal(document.getElementById("input2").value, "");
+		resolver.resolve(global.document.getElementById("app"), model);
+		assert.equal(global.document.getElementById("span").innerHTML, model.foo);
+		assert.equal(global.document.getElementById("input1").value, model.foo);
+		assert.equal(global.document.getElementById("input2").value, "");
 	});
 
 	it("updates the value in the bound attribute only if bindmode permit it", () => {
 		let model = {
-			foo: "Hello world"
+			foo: "Hello world",
+			bar: "oops"
 		};
 		let resolver = new BindResolver();
-		resolver.resolve(document.getElementById("app"), model);
+		resolver.resolve(global.document.getElementById("app"), model);
 
 		model.foo = "Hello again";
 		resolver.modelChanged(model, "foo");
 
-		assert.equal(document.getElementById("span").innerHTML, model.foo);
-		assert.equal(document.getElementById("input1").value, model.foo);
-		assert.equal(document.getElementById("input2").value, "");
+		assert.equal(global.document.getElementById("span").innerHTML, model.foo);
+		assert.equal(global.document.getElementById("input1").value, model.foo);
+		assert.equal(global.document.getElementById("input2").value, "");
 	});
 
 	it("updates the model with the bound attribute in twoways mode", () => {
 		let model = {
-			foo: "Hello world"
+			foo: "Hello world",
+			bar: "oops"
 		};
 		let resolver = new BindResolver();
-		resolver.resolve(document.getElementById("app"), model);
+		resolver.resolve(global.document.getElementById("app"), model);
 
-		let input = document.getElementById("input1");
+		let input = global.document.getElementById("input1");
 		input.value = "Hello again";
-		document.addEventListener("input", e => resolver.userInput(e));
+		global.document.addEventListener("input", e => resolver.userInput(e));
 
-		let evt = document.createEvent("Event");
+		let evt = global.document.createEvent("Event");
 		evt.initEvent("input", true, false);
 		input.dispatchEvent(evt);
 
@@ -71,16 +76,17 @@ describe("BindResolver", () => {
 
 	it("updates the model with the bound attribute in onewaytosource mode", () => {
 		let model = {
-			foo: "Hello world"
+			foo: "Hello world",
+			bar: "oops"
 		};
 		let resolver = new BindResolver();
-		resolver.resolve(document.getElementById("app"), model);
+		resolver.resolve(global.document.getElementById("app"), model);
 
-		let input = document.getElementById("input2");
+		let input = global.document.getElementById("input2");
 		input.value = "Hello again";
-		document.addEventListener("input", e => resolver.userInput(e));
+		global.document.addEventListener("input", e => resolver.userInput(e));
 
-		let evt = document.createEvent("Event");
+		let evt = global.document.createEvent("Event");
 		evt.initEvent("input", true, false);
 		input.dispatchEvent(evt);
 
@@ -89,19 +95,54 @@ describe("BindResolver", () => {
 
 	it("doesn't Update the model with the bound attribute in oneway mode", () => {
 		let model = {
-			foo: "Hello world"
+			foo: "Hello world",
+			bar: "oops"
 		};
 		let resolver = new BindResolver();
-		resolver.resolve(document.getElementById("app"), model);
+		resolver.resolve(global.document.getElementById("app"), model);
 
-		let input = document.getElementById("input3");
+		let input = global.document.getElementById("input3");
 		input.value = "Hello again";
-		document.addEventListener("input", e => resolver.userInput(e));
+		global.document.addEventListener("input", e => resolver.userInput(e));
 
-		let evt = document.createEvent("Event");
+		let evt = global.document.createEvent("Event");
 		evt.initEvent("input", true, false);
 		input.dispatchEvent(evt);
 
 		assert.equal(model.foo, "Hello world");
+	});
+
+	it("updates computed fields based on their components", () => {
+		let model = {
+			bar: "Hello world",
+			get foo() {
+				return this.bar.toUpperCase();
+			}
+		};
+
+		let resolver = new BindResolver();
+		resolver.resolve(global.document.getElementById("app"), model);
+
+		let span = global.document.getElementById("computed");
+		assert.equal(span.innerHTML, model.foo);
+
+		model.bar = "Hello again";
+		resolver.modelChanged(model, "bar");
+		assert.equal(span.innerHTML, model.foo);
+	});
+
+	it("can update multiple bindings", () => {
+		let model = {
+			foo: "Hello world",
+			bar: "1456"
+		};
+
+		let resolver = new BindResolver();
+		resolver.resolve(global.document.getElementById("app"), model);
+
+		let span = global.document.getElementById(model.bar);
+		assert.notEqual(span, null);
+		assert.equal(span.innerHTML, model.foo);
+
 	});
 });
