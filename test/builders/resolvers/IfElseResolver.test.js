@@ -29,9 +29,9 @@ describe("IfElseResolver", () => {
 				foo: false
 			};
 			let resolver = new IfElseResolver();
-			resolver.resolve(document.getElementById("app"), model);
+			resolver.resolve(global.document.getElementById("app"), model);
 
-			assert.strictEqual(document.getElementById("first-div"), null);
+			assert.strictEqual(global.document.getElementById("first-div"), null);
 		});
 
 		it("deletes content tagged with \"data-if\" if the property is equivalent to false (null)", () => {
@@ -39,9 +39,9 @@ describe("IfElseResolver", () => {
 				foo: null
 			};
 			let resolver = new IfElseResolver();
-			resolver.resolve(document.getElementById("app"), model);
+			resolver.resolve(global.document.getElementById("app"), model);
 
-			assert.strictEqual(document.getElementById("first-div"), null);
+			assert.strictEqual(global.document.getElementById("first-div"), null);
 		});
 
 		it("deletes content tagged with \"data-if\" if the property is equivalent to false ([])", () => {
@@ -49,9 +49,9 @@ describe("IfElseResolver", () => {
 				foo: []
 			};
 			let resolver = new IfElseResolver();
-			resolver.resolve(document.getElementById("app"), model);
+			resolver.resolve(global.document.getElementById("app"), model);
 
-			assert.strictEqual(document.getElementById("first-div"), null);
+			assert.strictEqual(global.document.getElementById("first-div"), null);
 		});
 
 		it("deletes content tagged with \"data-if\" if the property is equivalent to false (\"\")", () => {
@@ -59,16 +59,16 @@ describe("IfElseResolver", () => {
 				foo: ""
 			};
 			let resolver = new IfElseResolver();
-			resolver.resolve(document.getElementById("app"), model);
+			resolver.resolve(global.document.getElementById("app"), model);
 
-			assert.strictEqual(document.getElementById("first-div"), null);
+			assert.strictEqual(global.document.getElementById("first-div"), null);
 		});
 
 		it("throws an error if the evaluated property is undefined", () => {
 			let model = {
 			};
 			let resolver = new IfElseResolver();
-			assert.throws(() => resolver.resolve(document.getElementById("app"), model), Error, "The path lead to an undefined value in the given object.");
+			assert.throws(() => resolver.resolve(global.document.getElementById("app"), model), Error, "The path lead to an undefined value in the given object.");
 		});
 
 		it("keeps content tagged with \"data-if\" if the property is true", () => {
@@ -76,9 +76,9 @@ describe("IfElseResolver", () => {
 				foo: true
 			};
 			let resolver = new IfElseResolver();
-			resolver.resolve(document.getElementById("app"), model);
+			resolver.resolve(global.document.getElementById("app"), model);
 
-			assert.notStrictEqual(document.getElementById("first-div"), null);
+			assert.notStrictEqual(global.document.getElementById("first-div"), null);
 		});
 
 		it("removes the \"data-if\" tag after evaluation", () => {
@@ -86,9 +86,9 @@ describe("IfElseResolver", () => {
 				foo: true
 			};
 			let resolver = new IfElseResolver();
-			resolver.resolve(document.getElementById("app"), model);
+			resolver.resolve(global.document.getElementById("app"), model);
 
-			assert.strictEqual(document.getElementById("first-div").getAttribute("data-if"), null);
+			assert.strictEqual(global.document.getElementById("first-div").getAttribute("data-if"), null);
 		});
 	});
 
@@ -98,9 +98,9 @@ describe("IfElseResolver", () => {
 				foo: false
 			};
 			let resolver = new IfElseResolver();
-			resolver.resolve(document.getElementById("app"), model);
+			resolver.resolve(global.document.getElementById("app"), model);
 
-			assert.notStrictEqual(document.getElementById("second-div"), null);
+			assert.notStrictEqual(global.document.getElementById("second-div"), null);
 		});
 
 		it("keeps content tagged with \"data-else\" if the property is equivalent to false (null)", () => {
@@ -108,9 +108,9 @@ describe("IfElseResolver", () => {
 				foo: null
 			};
 			let resolver = new IfElseResolver();
-			resolver.resolve(document.getElementById("app"), model);
+			resolver.resolve(global.document.getElementById("app"), model);
 
-			assert.notStrictEqual(document.getElementById("second-div"), null);
+			assert.notStrictEqual(global.document.getElementById("second-div"), null);
 		});
 
 		it("keeps content tagged with \"data-else\" if the property is equivalent to false ([])", () => {
@@ -118,9 +118,9 @@ describe("IfElseResolver", () => {
 				foo: []
 			};
 			let resolver = new IfElseResolver();
-			resolver.resolve(document.getElementById("app"), model);
+			resolver.resolve(global.document.getElementById("app"), model);
 
-			assert.notStrictEqual(document.getElementById("second-div"), null);
+			assert.notStrictEqual(global.document.getElementById("second-div"), null);
 		});
 
 		it("keeps content tagged with \"data-else\" if the property is equivalent to false (\"\")", () => {
@@ -128,16 +128,16 @@ describe("IfElseResolver", () => {
 				foo: ""
 			};
 			let resolver = new IfElseResolver();
-			resolver.resolve(document.getElementById("app"), model);
+			resolver.resolve(global.document.getElementById("app"), model);
 
-			assert.notStrictEqual(document.getElementById("second-div"), null);
+			assert.notStrictEqual(global.document.getElementById("second-div"), null);
 		});
 
 		it("throws an error if the evaluated property is undefined", () => {
 			let model = {
 			};
 			let resolver = new IfElseResolver();
-			assert.throws(() => resolver.resolve(document.getElementById("app"), model), Error, "The path lead to an undefined value in the given object.");
+			assert.throws(() => resolver.resolve(global.document.getElementById("app"), model), Error, "The path lead to an undefined value in the given object.");
 		});
 
 		it("deletes content tagged with \"data-else\" if the property is true", () => {
@@ -145,9 +145,9 @@ describe("IfElseResolver", () => {
 				foo: true
 			};
 			let resolver = new IfElseResolver();
-			resolver.resolve(document.getElementById("app"), model);
+			resolver.resolve(global.document.getElementById("app"), model);
 
-			assert.strictEqual(document.getElementById("second-div"), null);
+			assert.strictEqual(global.document.getElementById("second-div"), null);
 		});
 
 		it("removes the \"data-else\" tag after evaluation", () => {
@@ -155,9 +155,9 @@ describe("IfElseResolver", () => {
 				foo: false
 			};
 			let resolver = new IfElseResolver();
-			resolver.resolve(document.getElementById("app"), model);
+			resolver.resolve(global.document.getElementById("app"), model);
 
-			assert.strictEqual(document.getElementById("second-div").getAttribute("data-else"), null);
+			assert.strictEqual(global.document.getElementById("second-div").getAttribute("data-else"), null);
 		});
 	});
 });
