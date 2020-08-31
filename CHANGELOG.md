@@ -14,6 +14,8 @@
 
 ### 1.0.1 - First fix - 30/08/2020 
 
+**Minor changes**
+
 * Typos correction in README.md (quick start section)
 * Remove es6 exports that were forgotten and made the module not workings
 
@@ -24,11 +26,8 @@
 **Core features**
 
 * Adding the possibility to bind multiple properties with one *data-bind* attribute
-
 * Adding the possibility to use computed properties within a *data-bind* attribute
-
 * Adding the possiblility to bind multiple actions with one *data-action* attribute
-
 * Adding the possibility to pass arguments to actions
 
 
