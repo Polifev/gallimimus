@@ -143,6 +143,5 @@ describe("BindResolver", () => {
 		let span = global.document.getElementById(model.bar);
 		assert.notEqual(span, null);
 		assert.equal(span.innerHTML, model.foo);
-
 	});
 });

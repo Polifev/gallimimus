@@ -5,15 +5,17 @@ const { BindResolver } = require("./builders/resolvers/BindResolver");
 const { ActionsResolver } = require("./builders/resolvers/ActionsResolver");
 const { ComponentsResolver } = require("./builders/resolvers/ComponentsResolver");
 const { Component } = require("./Component");
+const { ClassResolver } = require("./builders/resolvers/ClassResolver");
 const onChange = require("on-change");
 
 class Gallimimus {
 	constructor() {
-		this._componentsResolver = new ComponentsResolver(["data-bind", "data-action", "data-if", "data-else", "data-foreach", "data-root"]);
-		this._foreachResolver = new ForeachResolver(["data-bind", "data-action", "data-if", "data-else", "data-foreach"]);
+		this._componentsResolver = new ComponentsResolver(["data-bind", "data-action", "data-if", "data-else", "data-foreach", "data-root", "data-class"]);
+		this._foreachResolver = new ForeachResolver(["data-bind", "data-action", "data-if", "data-else", "data-foreach", "data-class"]);
 		this._ifElseResolver = new IfElseResolver();
 		this._bindResolver = new BindResolver();
 		this._actionsResolver = new ActionsResolver();
+		this._classResolver = new ClassResolver();
 
 		this._reloadNeeded = false;
 		this._builder = null;
@@ -29,8 +31,10 @@ class Gallimimus {
 
 		// eslint-disable-next-line no-unused-vars
 		let watchedModel = onChange(model, function (path, value, previousValue, name) {
-			console.log(path);
 			self._bindResolver.modelChanged(watchedModel, path);
+			self._classResolver.modelChanged(watchedModel, path);
+
+			// TODO ask each resolver if reload is needed
 			if (typeof value !== "string") {
 				self._reloadNeeded = true;
 			}
@@ -47,7 +51,8 @@ class Gallimimus {
 			.withDirectiveResolver(this._foreachResolver)
 			.withDirectiveResolver(this._ifElseResolver)
 			.withDirectiveResolver(this._bindResolver)
-			.withDirectiveResolver(this._actionsResolver);
+			.withDirectiveResolver(this._actionsResolver)
+			.withDirectiveResolver(this._classResolver);
 
 		INPUT_EVENTS.forEach(eventName => document.addEventListener(eventName, (e) => this._bindResolver.userInput(e)));
 		ACTION_EVENTS.forEach(eventName => document.addEventListener(eventName, (e) => this._actionsResolver.userAction(e)));
