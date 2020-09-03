@@ -11,7 +11,7 @@ const onChange = require("on-change");
 class Gallimimus {
 	constructor() {
 		this._componentsResolver = new ComponentsResolver(["data-bind", "data-action", "data-if", "data-else", "data-foreach", "data-root", "data-class"]);
-		this._foreachResolver = new ForeachResolver(["data-bind", "data-action", "data-if", "data-else", "data-foreach", "data-class"]);
+		this._foreachResolver = new ForeachResolver();
 		this._ifElseResolver = new IfElseResolver();
 		this._bindResolver = new BindResolver();
 		this._actionsResolver = new ActionsResolver();

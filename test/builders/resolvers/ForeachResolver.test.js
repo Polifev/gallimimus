@@ -14,18 +14,18 @@ describe("ForeachResolver", () => {
         <body>
 			<div id="app">
 				<ul id="users-list">
-					<li data-foreach="users" data-bind="$elt.firstname"></li>
+					<li data-foreach="{'path':'users'}" data-bind="{'path':'$elt.firstname'}"></li>
 				</ul>
 				<div id="detailed-users">
-					<div data-foreach="users">
+					<div data-foreach="{'path':'users'}">
 						nicknames:
 						<ul>
-							<li data-foreach="$elt.nicknames" class="nickname"></li>
+							<li data-foreach="{'path':'$elt.nicknames'}" class="nickname"></li>
 						</ul>
 					</div>
 				</div>
-				<div id="first-div" data-if="foo"></div>
-				<div id="second-div" data-else="foo"></div>
+				<div id="first-div" data-if="{'path':'foo'}"></div>
+				<div id="second-div" data-else="{'path':'foo'}"></div>
 			</div>
         </body>
         </html>
@@ -64,7 +64,7 @@ describe("ForeachResolver", () => {
 		let resolver = new ForeachResolver(["data-if", "data-else", "data-foreach", "data-bind", "data-action"]);
 		resolver.resolve(global.document.getElementById("app"), model);
 
-		assert.strictEqual(global.document.querySelector("[data-bind]").getAttribute("data-bind"), "users.0.firstname");
+		assert.strictEqual(global.document.querySelector("[data-bind]").getAttribute("data-bind"), "{'path':'users.0.firstname'}");
 	});
 
 	it("supports nested foreach", () => {
