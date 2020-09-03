@@ -35,6 +35,22 @@ class ClassResolver extends AbstractDirectiveResolver {
 	}
 
 	_parse(attribute) {
+		try {
+			attribute = attribute.replace(/'/g, "\"");
+			let parsed = JSON.parse(attribute);
+			let bindings = Array.isArray(parsed) ? parsed : [parsed];
+			bindings.map(binding => {
+				binding.mode = binding.mode || "text";
+				binding.args = binding.args || [];
+				binding.removeOldClass = function () { };
+				return binding;
+			});
+			return bindings;
+		} catch (e) {
+			throw new Error(`Invalid format: ${attribute}`);
+		}
+
+		/*
 		let result = [];
 		let bindingStrings = attribute.split(";");
 		bindingStrings.forEach(bindingString => {
@@ -48,16 +64,17 @@ class ClassResolver extends AbstractDirectiveResolver {
 			};
 			let start = binding.mode == ClassMode.TEXT ? 2 : 3;
 			for (let i = start; i < parts.length; i++) {
-				binding.computeParts.push(parts[i]);
+				binding.args.push(parts[i]);
 			}
 			result.push(binding);
 		});
 		return result;
+		*/
 	}
 
 	_apply(element, model, binding) {
 		if (binding.mode === ClassMode.TOGGLE) {
-			element.classList.toggle(binding.className, findProperty(model, binding.path));
+			element.classList.toggle(binding.class, findProperty(model, binding.path));
 		} else if (binding.mode === ClassMode.TEXT) {
 			binding.removeOldClass();
 			let className = findProperty(model, binding.path);
@@ -68,9 +85,9 @@ class ClassResolver extends AbstractDirectiveResolver {
 		}
 
 		this._passiveListeners.push((m, p) => {
-			if (p === binding.path || binding.computeParts.includes(p)) {
+			if (p === binding.path || binding.args.includes(p)) {
 				if (binding.mode === ClassMode.TOGGLE) {
-					element.classList.toggle(binding.className, findProperty(model, binding.path));
+					element.classList.toggle(binding.class, findProperty(model, binding.path));
 				} else if (binding.mode === ClassMode.TEXT) {
 					binding.removeOldClass();
 					let className = findProperty(model, binding.path);

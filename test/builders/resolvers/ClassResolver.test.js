@@ -13,12 +13,13 @@ describe("ClassResolver", () => {
 	</head>
 	<body>
 		<div id="app">
-			<p id="toggleClass" data-class="foo,toggle,myClass"></p>
-			<p id="textClass" data-class="foo"></p>
-			<p id="multipleTextClass" data-class="foo;bar"></p>
-			<p id="multipleToggleClass" data-class="foo,toggle,myFirstClass;bar,toggle,mySecondClass"></p>
-			<p id="computedTextClass" data-class="bar,text,foo"></p>
-			<p id="computedToggleClass" data-class="bar,toggle,myClass,foo"></p>
+			<p id="toggleClass" data-class="{'path':'foo','mode':'toggle','class':'myClass'}"></p>
+			<p id="textClass" data-class="{'path':'foo'}"></p>
+			<p id="multipleTextClass" data-class="[{'path':'foo'},{'path':'bar'}]"></p>
+			<p id="multipleToggleClass" 
+				data-class="[{'path':'foo','mode':'toggle','class':'myFirstClass'},{'path':'bar','mode':'toggle','class':'mySecondClass'}]"></p>
+			<p id="computedTextClass" data-class="{'path':'bar','mode':'text','args':['foo']}"></p>
+			<p id="computedToggleClass" data-class="{'path':'bar','mode':'toggle','class':'myClass','args':['foo']}"></p>
 		</div>
 	</body>
 	</html>
