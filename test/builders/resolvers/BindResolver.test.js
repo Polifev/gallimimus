@@ -13,12 +13,12 @@ describe("BindResolver", () => {
         </head>
         <body>
 			<div id="app">
-				<span id="span" data-bind="foo"></span>
-				<input id="input1" data-bind="foo,twoways,value" />
-				<input id="input2" data-bind="foo,onewaytosource,value" />
-				<input id="input3" data-bind="foo,oneway,value" />
-				<span id="computed" data-bind="foo,oneway,innerHTML,bar"></span>
-				<span data-bind="foo,oneway,innerHTML;bar,oneway,id"></span>
+				<span id="span" data-bind="{'path':'foo'}"></span>
+				<input id="input1" data-bind="{'path':'foo','mode':'twoways','bindTo':'value'}" />
+				<input id="input2" data-bind="{'path':'foo','mode':'onewaytosource','bindTo':'value'}" />
+				<input id="input3" data-bind="{'path':'foo','bindTo':'value'}" />
+				<span id="computed" data-bind="{'path':'foo', 'args':['bar']}"></span>
+				<span data-bind="[{'path':'foo'},{'path':'bar','bindTo':'id'}]"></span>
 			</div>
         </body>
         </html>
