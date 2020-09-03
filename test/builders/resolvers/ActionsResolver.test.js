@@ -13,12 +13,12 @@ describe("ActionsResolver", () => {
         </head>
         <body>
 			<div id="app">
-				<button id="btn" data-action="foo">Ok</button>
-				<input id="input" data-action="foo,change" />
-				<input id="dblBindInput" data-action="foo,click;bar,change" />
-				<input id="dblBindInputSame" data-action="foo,click;foo,change" />
-				<button id="dblActionButton" data-action="foo;bar">Yo</button>
-				<button id="argsButton" data-action="foo,click,x,z;">Yo</button>
+				<button id="btn" data-action="{'action':'foo'}">Ok</button>
+				<input id="input" data-action="{'action':'foo','event':'change'}" />
+				<input id="dblBindInput" data-action="[{'action':'foo','event':'click'},{'action':'bar','event':'change'}]" />
+				<input id="dblBindInputSame" data-action="[{'action':'foo','event':'click'},{'action':'foo','event':'change'}]" />
+				<button id="dblActionButton" data-action="[{'action':'foo'},{'action':'bar'}]">Yo</button>
+				<button id="argsButton" data-action="{'action':'foo','event':'click','args':['x','z']}">Yo</button>
 			</div>
         </body>
         </html>
