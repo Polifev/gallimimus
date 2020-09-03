@@ -13,8 +13,8 @@ describe("IfElseResolver", () => {
         </head>
         <body>
 			<div id="app">
-				<div id="first-div" data-if="foo"></div>
-				<div id="second-div" data-else="foo"></div>
+				<div id="first-div" data-if="{'path':'foo'}"></div>
+				<div id="second-div" data-else="{'path':'foo'}"></div>
 			</div>
         </body>
         </html>

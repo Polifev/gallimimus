@@ -5,8 +5,9 @@ class IfElseResolver extends AbstractDirectiveResolver {
 	resolve(node, model) {
 		let elements = node.querySelectorAll("[data-if]");
 		elements.forEach(element => {
-			let dataAttribute = element.getAttribute("data-if");
-			let prop = findProperty(model, dataAttribute);
+			let attribute = element.getAttribute("data-if");
+			let binding = this._parse(attribute);
+			let prop = findProperty(model, binding.path);
 			if (!IfElseResolver.evaluateProp(prop)) {
 				element.parentElement.removeChild(element);
 			}
@@ -15,13 +16,24 @@ class IfElseResolver extends AbstractDirectiveResolver {
 
 		elements = node.querySelectorAll("[data-else]");
 		elements.forEach(element => {
-			let dataAttribute = element.getAttribute("data-else");
-			let prop = findProperty(model, dataAttribute);
+			let attribute = element.getAttribute("data-else");
+			let binding = this._parse(attribute);
+			let prop = findProperty(model, binding.path);
 			if (IfElseResolver.evaluateProp(prop)) {
 				element.parentElement.removeChild(element);
 			}
 			element.removeAttribute("data-else");
 		});
+	}
+
+	_parse(attribute){
+		try{
+            attribute = attribute.replace(/'/g, "\"");
+            let parsed = JSON.parse(attribute);
+            return parsed;
+        } catch(e){
+            throw new Error(`Invalid format: ${attribute}`);
+        }
 	}
 
 	static evaluateProp(prop) {
