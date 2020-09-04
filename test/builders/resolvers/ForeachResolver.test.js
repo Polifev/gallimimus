@@ -41,7 +41,7 @@ describe("ForeachResolver", () => {
 				{ firstname: "John", lastname: "Doe", nicknames: [] }
 			]
 		};
-		let resolver = new ForeachResolver(["data-if", "data-else", "data-foreach", "data-bind", "data-action"]);
+		let resolver = new ForeachResolver();
 		resolver.resolve(global.document.getElementById("app"), model);
 		assert.strictEqual(global.document.getElementById("users-list").childElementCount, 2);
 	});
@@ -50,7 +50,7 @@ describe("ForeachResolver", () => {
 		let model = {
 			users: []
 		};
-		let resolver = new ForeachResolver(["data-if", "data-else", "data-foreach", "data-bind", "data-action"]);
+		let resolver = new ForeachResolver();
 		resolver.resolve(global.document.getElementById("app"), model);
 		assert.strictEqual(global.document.getElementById("users-list").childElementCount, 0);
 	});
@@ -61,7 +61,7 @@ describe("ForeachResolver", () => {
 				{ firstname: "Pol", lastname: "Lefèvre", nicknames: [] }
 			]
 		};
-		let resolver = new ForeachResolver(["data-if", "data-else", "data-foreach", "data-bind", "data-action"]);
+		let resolver = new ForeachResolver();
 		resolver.resolve(global.document.getElementById("app"), model);
 
 		assert.strictEqual(global.document.querySelector("[data-bind]").getAttribute("data-bind"), "{'path':'users.0.firstname'}");
@@ -89,7 +89,7 @@ describe("ForeachResolver", () => {
 				}
 			]
 		};
-		let resolver = new ForeachResolver(["data-if", "data-else", "data-foreach", "data-bind", "data-action"]);
+		let resolver = new ForeachResolver();
 		resolver.resolve(global.document.getElementById("app"), model);
 
 		assert.equal(global.document.getElementsByClassName("nickname").length, 5);

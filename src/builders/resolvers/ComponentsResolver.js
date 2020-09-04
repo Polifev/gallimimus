@@ -7,10 +7,10 @@ class ComponentsResolver extends AbstractDirectiveResolver {
 	 * @param {*} componentsLibrary A map that contains all the registered
 	 * components that can be injected.
 	 */
-	constructor(customAttributes) {
+	constructor() {
 		super();
 		this._componentsLibrary = {};
-		this._customAttributes = customAttributes;
+		this._customAttributes = ["data-component","data-bind", "data-action", "data-if", "data-else", "data-foreach", "data-class"];
 	}
 
 	registerComponent(name, component) {
@@ -21,9 +21,8 @@ class ComponentsResolver extends AbstractDirectiveResolver {
 		let elements = node.querySelectorAll("[data-component]");
 		if (elements.length > 0) {
 			elements.forEach(templateElement => {
-				let componentName = templateElement.getAttribute("data-component");
-				let dataRoot = templateElement.getAttribute("data-root");
-				this._deployComponent(templateElement, componentName, dataRoot);
+				let component = this._parse(templateElement.getAttribute("data-component"));
+				this._deployComponent(templateElement, component.name, component.path);
 			});
 			this.resolve(node, model);
 		}
@@ -35,6 +34,7 @@ class ComponentsResolver extends AbstractDirectiveResolver {
 		this._customAttributes.forEach(attributeName => {
 			this._copyAttributes(attributeName, templateElement, element);
 		});
+
 		templateElement.parentElement.insertBefore(element, templateElement);
 		templateElement.parentElement.removeChild(templateElement);
 
@@ -43,26 +43,59 @@ class ComponentsResolver extends AbstractDirectiveResolver {
 				this._inject(attribute, element, dataRoot);
 			});
 		}
+		element.removeAttribute("data-component");
 	}
 
 	_copyAttributes(attributeName, templateElement, element) {
 		let attr = templateElement.getAttribute(attributeName);
-
-		console.log(attributeName);
-		console.log(attr);
-
 		if (attr != null) {
 			element.setAttribute(attributeName, attr);
 		}
 	}
 
-	_inject(attributeName, parent, dataForeachAttribute) {
-		parent.querySelectorAll(`[${attributeName}]`)
-			.forEach(child => {
-				let attr = child.getAttribute(attributeName);
-				attr = `${dataForeachAttribute}.${attr}`;
-				child.setAttribute(attributeName, attr);
+	_parse(attribute) {
+		try {
+			let result = JSON.parse(attribute.replace(/'/g, "\""));
+			result.path = result.path || "";
+			return result;
+		} catch (e) {
+			throw new Error(`Invalid format: ${attribute}`);
+		}
+	}
+
+	_inject(attributeName, parent, dataRoot) {
+		let elts = [];
+		parent.querySelectorAll(`[${attributeName}]`).forEach(child => elts.push(child));
+		if(parent.hasAttribute(attributeName)){
+			elts.push(parent);
+		}
+			
+		elts.forEach(child => {
+			let attr = child.getAttribute(attributeName);
+			let parsed = JSON.parse(attr.replace(/'/g, "\""));
+			parsed = Array.isArray(parsed) ? parsed : [parsed];
+
+			parsed.map(props => {
+				if (props.path) {
+					props.path = this._resolvePath(props.path, dataRoot);
+				}
+				if (props.args) {
+					props.args = props.args.map(path => this._resolvePath(path, dataRoot));
+				}
+				return props;
 			});
+			if (parsed.length == 1) {
+				parsed = parsed[0];
+			}
+			child.setAttribute(attributeName, JSON.stringify(parsed).replace(/"/g, "'"));
+		});
+	}
+
+	_resolvePath(path, dataRoot){
+		if(path === "")
+			return dataRoot;
+		else
+			return `${dataRoot}.${path}`;
 	}
 }
 
