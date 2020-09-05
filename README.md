@@ -171,13 +171,11 @@ Here, we precise that we want the action to be triggered with the event ``change
 
 #### Syntax
 
-A *data-action* attribute is written like this:  ``[path](,[event-name](,[args]))``.  separating them with semicolons, just as with the *data-bind* attribute. Don't be afraid to bind the same event to several actions but be aware that the order in which they will be called is not guaranteed to be the same as the order in which they are declared.
-
-|      name      |                         description                          | default value |
-| :------------: | :----------------------------------------------------------: | :-----------: |
-|    ``path``    |        A path to the method to be bound in your model        |       -       |
-| ``event-name`` |          The event that will linked to your action           |   ``click``   |
-|    ``args``    | A list of paths to values in the model that you want to provide as arguments to the action function. |    ``[]``     |
+|   name    |                         description                          | default value |
+| :-------: | :----------------------------------------------------------: | :-----------: |
+| ``path``  |        A path to the method to be bound in your model        |  *Mandatory*  |
+| ``event`` |          The event that will linked to your action           |   ``click``   |
+| ``args``  | A list of paths to values in the model that you want to provide as arguments to the action function. |    ``[]``     |
 
 #### List of the bindable events
 
@@ -187,10 +185,46 @@ A *data-action* attribute is written like this:  ``[path](,[event-name](,[args])
 #### Notes
 
 * Just as with *data-bind*, you can bind multiple events to multiple actions by putting them in a JSON array.
+* Don't be afraid to bind the same event to several actions but be aware that the order in which they will be called is not guaranteed to be the same as the order in which they are declared.
 
 ### data-if & data-else
+
+#### Usage
+
+Sometimes, you want certain information to appear only at a certain condition. That's why *data-if* and *data-else* directives are made for. With these, you can cut parts out of your template (they are not just applied a "display:none" style). Let's have a look at an example :
+
+```html
+<div>
+    <a data-if="{'path':'currentUser.isPremium'}" href="./premium">Access to your premium account now</a>
+    <a data-else="{'path':'currentUser.isPremium'}" href="./buy-premium">Get premium access today for only 99.99€</a>
+</div>
+```
+
+As you can see, *data-if* directives takes only one argument which is the path to a boolean-like value in your model. Here, we decided to print a particular anchor if the user has subscribed to a premium account. Be aware that it remains a client-side process so it shouldn't be used (alone) for critical security features. 
+
+As most of directives, the binding is dynamic and if the value changes, the tagged element can appear/disappear without page reloading. Nevertheless will a template rebuild be necessary in order to make it appear/disappear again. I explain in more details the lifecycle of your page in [this section](#document-lifecycle).
+
+#### Syntax
+
+|   name   |                    description                    | default value |
+| :------: | :-----------------------------------------------: | :-----------: |
+| ``path`` | A path to the attribute to be bound in your model |  *Mandatory*  |
+
+#### Notes
+
+/
 
 ### data-foreach
 
 ### data-component
+
+### data-class
+
+## Understanding Gallimimus
+
+In this section, we'll discover in more details how Gallimimus works under the hood.
+
+### Document lifecycle
+
+
 
