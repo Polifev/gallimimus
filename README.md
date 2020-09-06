@@ -195,14 +195,16 @@ Sometimes, you want certain information to appear only at a certain condition. T
 
 ```html
 <div>
-    <a data-if="{'path':'currentUser.isPremium'}" href="./premium">Access to your premium account now</a>
-    <a data-else="{'path':'currentUser.isPremium'}" href="./buy-premium">Get premium access today for only 99.99€</a>
+    <a data-if="{'path':'currentUser.isPremium'}"
+       href="./premium">Access to your premium account now</a>
+    <a data-else="{'path':'currentUser.isPremium'}"
+       href="./buy-premium">Get premium access today for only 99.99€</a>
 </div>
 ```
 
-As you can see, *data-if* directives takes only one argument which is the path to a boolean-like value in your model. Here, we decided to print a particular anchor if the user has subscribed to a premium account. Be aware that it remains a client-side process so it shouldn't be used (alone) for critical security features. 
+As you can see, *data-if* directives takes only one argument which is the path to a boolean-like value in your model. Here, we decided to print a particular ``<a>`` if the user has subscribed to a premium account and another one if the user has *not* subscribed yet. Be aware that it remains a client-side process so it shouldn't be used (alone) for critical security features. 
 
-As most of directives, the binding is dynamic and if the value changes, the tagged element can appear/disappear without page reloading. Nevertheless will a template rebuild be necessary in order to make it appear/disappear again. I explain in more details the lifecycle of your page in [this section](#document-lifecycle).
+As most of directives, the binding is dynamic and if the value of ``yourModel.currentUser.isPremium`` changes, the tagged element can appear/disappear without page reloading. Nevertheless will a template rebuild be necessary in order to make it appear/disappear again. I explain in more details the lifecycle of your page in [this section](#document-lifecycle).
 
 #### Syntax
 
@@ -212,13 +214,94 @@ As most of directives, the binding is dynamic and if the value changes, the tagg
 
 #### Notes
 
-/
+* *data-else* works simply the opposite way than *data-if* and literally means "data-if-not".
+* You can bind properties that are not strictly booleans. For example : printing a message if an array is empty by passing the array to a *data-else* directive.
+
+### data-class
+
+// TODO
 
 ### data-foreach
 
+#### Usage
+
+Here, we'll discuss about rendering an array of elements using the *data-foreach* directive. As always, we'll start by looking at an example :
+
+```html
+<ul>
+	<li data-foreach="{'path':'daysOfWeek'}"
+		data-bind="{'path':'$elt'}">
+    </li>
+</ul>
+```
+
+In this example, we want our web page to display every string that ``yourModel.daysOfWeek`` contains. To achieve it, we start by adding the *data-foreach* directive pointing on the array property that we want to iterate over. This will copy the ``<li>`` element as many times as there are items in ``yourModel.daysOfWeek``. Then, to bind the value displayed by the `<li>` element, we add the *data-bind* attribute to a special path : *$elt*. This path will refer to each element of the array (``yourModel.daysOfWeek[0]``, ``yourModel.daysOfWeek[1]``, etc.). In this case, as we have an array of strings, we use the root of *$elt* as a path for the displayed value in the *data-bind* attribute.
+
+Let's see a little more complex example :
+
+```html
+<div>
+	<div data-foreach="{'path':'users'}">
+        <div>
+            <label>Firstname</label>
+            <input type="text" 
+                   data-bind="{'path':'$elt.firstname', 'mode':'twoways', 'bindTo':'value'}"/>
+            <label>Lastname</label>
+            <input type="text" 
+                   data-bind="{'path':'$elt.lastname', 'mode':'twoways', 'bindTo':'value'}"/>
+        </div>
+    </div>
+</div>
+```
+
+In this case, ``yourModel.users`` refers to an array of objects holding two properties : ``firstname`` and ``lastname``. As you can see, we can access internal properties of *$elt*, even in a *twoways* data-binding mode. 
+
+Let's go a step further with the next example : 
+
+```html
+<div>
+	<div data-foreach="{'path':'users'}">
+        <div>
+            <label>Firstname</label>
+            <input type="text" 
+                   data-bind="{'path':'$elt.firstname', 'mode':'twoways', 'bindTo':'value'}"/>
+            <label>Lastname</label>
+            <input type="text" 
+                   data-bind="{'path':'$elt.lastname', 'mode':'twoways', 'bindTo':'value'}"/>
+            <ul>
+            	<li data-foreach="{'path':'$elt.friends'}"
+                    data-bind="{'path':'$elt.$elt.firstname'}"></li>
+            </ul>
+        </div>
+    </div>
+</div>
+```
+
+In this third example, we've added a nested *data-foreach* in our template. It will show us a list of the firstnames of the friends of our users. Notice the ``$elt.$elt.firstname``. It can look strange at first sight. In fact, it will be transformed in something like: ``users[m].friends[n].firstname``. Why do we have to precise these *$elt* ? Because we could want to bind to something external to our loop. See this next example:
+
+```html
+<div>
+	<div data-foreach="{'path':'users'}">
+        <div>
+            <label>Firstname</label>
+            <input type="text" 
+                   data-bind="{'path':'$elt.firstname', 'mode':'twoways', 'bindTo':'value'}"/>
+            <label>Lastname</label>
+            <input type="text" 
+                   data-bind="{'path':'$elt.lastname', 'mode':'twoways', 'bindTo':'value'}"/>
+            <button data-action="{'path':'removeUser', 'args':['$elt']}">
+                Delete
+            </button>
+        </div>
+    </div>
+</div>
+```
+
+Here, we want to add a button that will delete our user on click. This can be done through the *data-action* directive. This will be bound to the function ``yourModel.removeUser`` with ``user[m]`` as an argument. In fact, you can use *$elt* in every *path* or *args* property of your directives whatever they are (*data-if*, *data-class*, *data-action*, ...)
+
 ### data-component
 
-### data-class
+// TODO
 
 ## Understanding Gallimimus
 
@@ -226,5 +309,5 @@ In this section, we'll discover in more details how Gallimimus works under the h
 
 ### Document lifecycle
 
-
+// TODO
 
