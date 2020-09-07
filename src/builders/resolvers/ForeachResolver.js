@@ -71,7 +71,7 @@ class ForeachResolver extends AbstractDirectiveResolver {
 						props.path = this._resolvePath(props.path, path, index);
 					}
 					if (props.args) {
-						props.args = props.args.map(path => this._resolvePath(path, path, index));
+						props.args = props.args.map(p => this._resolvePath(p, path, index));
 					}
 					return props;
 				});
