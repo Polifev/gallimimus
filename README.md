@@ -177,11 +177,6 @@ Here, we precise that we want the action to be triggered with the event ``change
 | ``event`` |          The event that will linked to your action           |   ``click``   |
 | ``args``  | A list of paths to values in the model that you want to provide as arguments to the action function. |    ``[]``     |
 
-#### List of the bindable events
-
-* ``click``
-* ``change``
-
 #### Notes
 
 * Just as with *data-bind*, you can bind multiple events to multiple actions by putting them in a JSON array.

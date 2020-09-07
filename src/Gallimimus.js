@@ -6,6 +6,8 @@ const { ActionsResolver } = require("./builders/resolvers/ActionsResolver");
 const { ComponentsResolver } = require("./builders/resolvers/ComponentsResolver");
 const { Component } = require("./Component");
 const { ClassResolver } = require("./builders/resolvers/ClassResolver");
+const ACTION_EVENTS = require("./EventsList");
+const INPUT_EVENTS = ["input"];
 const onChange = require("on-change");
 
 class Gallimimus {
@@ -23,8 +25,6 @@ class Gallimimus {
 
 	load(appRootId, document, model) {
 		let self = this;
-		const INPUT_EVENTS = ["input"];
-		const ACTION_EVENTS = ["click", "change"];
 
 		let root = document.getElementById(appRootId);
 		let rootClone = root.cloneNode(true);
