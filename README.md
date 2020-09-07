@@ -219,7 +219,80 @@ As most of directives, the binding is dynamic and if the value of ``yourModel.cu
 
 ### data-class
 
-// TODO
+#### Usage
+
+For UI features, you often need to set particular CSS classes to elements in order to display them properly regarding the data they hold. For this specific task, Gallimimus offers you a neat way of doing. Let's take a look at this first example :
+
+```html
+<div data-class="{'path':'currentUser.sex'}">
+	<!-- Some user data -->
+</div>
+<style>
+    .male{
+        background-color: blue;
+    }
+    .female{
+        background-color: magenta;
+    }
+    .other{
+        background-color: grey;
+    }
+</style>
+```
+
+In this example, we used ``yourModel.currentUser.sex`` string as a class for our ``<div>`` which will set the color of its background. If the value changes, the old class will be removed and a class with the new value will be added.
+
+It is not the only way to use *data-class*. Let's take another example :
+
+```html
+<div>
+    <input type="text" 
+           data-bind="{'path':'firstname', 'mode':'twoways', 'bindTo':'value'}" 
+           data-class="{'path':'firstname', 'mode':'toggle', 'class':'filled'}"/>
+</div>
+<style>
+    .filled{
+        outline: 1px solid green;
+    }
+</style>
+```
+
+Here, we decided to toggle a defined class based on the value of a boolean-like property. This code will toggle a green outline around ``<input/>`` that contains a non-empty value. This can do the job but it's not very elegant. A good improvement here would be to create a computed property ``firstnameIsOk`` with the javascript *get* operator that returns for example ``this.firstname.length >= 3`` and bind this to our class :
+
+```
+<div>
+    <input type="text" 
+           data-bind="{'path':'firstname', 'mode':'twoways', 'bindTo':'value'}" 
+           data-class="{'path':'firstnameIsOk', 'mode':'toggle', 'class':'filled', 'args':['firstname']}"/>
+</div>
+<style>
+    .filled{
+        outline: 1px solid green;
+    }
+</style>
+```
+
+With this technique, you can achieve more precise validation (by using regular expressions for example). Please note that if you chose a computed property approach, you'll need to provide the list of properties that are used for computation in the *args* attribute. Else, you wouldn't take benefit of the dynamic update.
+
+#### Syntax
+
+| Property  | Description                                                  | Default value |
+| :-------- | :----------------------------------------------------------- | :------------ |
+| ``path``  | A path to the value to be bound in your model                | *Mandatory*   |
+| ``mode``  | Either ``text`` or ``toggle``                                | ``text``      |
+| ``class`` | A statically defined class to be toggled when you use the ``toggle`` mode (ignored in ``text`` mode) | ""            |
+| ``args``  | A list of paths to values that should also trigger an update when modified. It is mainly used for computed properties with the ``get`` operator. To achieve this, simply put in this array all the attributes that are used in the computation of the value you want to bind. | ``[]``        |
+
+#### Class binding modes
+
+|    Mode    |                         Description                         |
+| :--------: | :---------------------------------------------------------: |
+|  ``text``  |         Use the content of the property as a class          |
+| ``toggle`` | Toggle a statically defined class when the property == true |
+
+#### Notes
+
+* This can be used for hiding content without rebuilding the page using a "display: none;" style.
 
 ### data-foreach
 
@@ -298,6 +371,12 @@ In this third example, we've added a nested *data-foreach* in our template. It w
 ```
 
 Here, we want to add a button that will delete our user on click. This can be done through the *data-action* directive. This will be bound to the function ``yourModel.removeUser`` with ``user[m]`` as an argument. In fact, you can use *$elt* in every *path* or *args* property of your directives whatever they are (*data-if*, *data-class*, *data-action*, ...)
+
+#### Syntax
+
+| Property | Description                                         | Default value |
+| :------- | :-------------------------------------------------- | :------------ |
+| ``path`` | A path to the array value to be bound in your model | *Mandatory*   |
 
 ### data-component
 
