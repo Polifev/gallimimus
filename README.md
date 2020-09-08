@@ -64,26 +64,33 @@ Then, create a file named ``index.js``. That will be the root of our application
 ```javascript
 const { Gallimimus } = require("@polifev/gallimimus");
 
-let model = {
-    userManager:{
-        greetings(){
-          	alert("Hello world");
-        },
-        users:[
-        	{ firstname: "Pol", lastname: "Lefèvre" },
-        	{ firstname: "John", lastname: "Doe" }
-    	]
-    }
-};
-
 document.addEventListener("readystatechange", () => {
 	if (document.readyState === "complete") {
+        // Declare the data model for your application
+        let model = {
+            userManager:{
+                greetings(){
+                    alert("Hello world");
+                },
+                users:[
+                    { firstname: "Pol", lastname: "Lefèvre" },
+                    { firstname: "John", lastname: "Doe" }
+                ]
+            }
+        };
+        
+        // Create the Gallimimus instance
 		let gallimimus = new Gallimimus();
+        
+        // Bind your model the template
         model = gallimimus.load(
             "app",		// The ID of the root element in your template
             document,	// A reference to the browser's document
             model		// The model that you will bind with your template
         );
+        
+        // Here you can test the data-binding by modifying values in the model
+        // ---
 	}
 });
 ```
@@ -375,7 +382,80 @@ Here, we want to add a button that will delete our user on click. This can be do
 
 ### data-component
 
-// TODO
+#### Usage
+
+When you work on larger applications, you may want to subdivide your template into smaller parts. Either you want to reuse some parts or maybe to factorize you code in order to have a more readable project. That's what *data-component* directive aims for. First of all, let's see how we can declare a component :
+
+```js
+// ./index.js
+const {Component, Gallimimus} = require("@polifev/gallimimus");
+
+document.addEventListener("readystatechange", () =>{
+    if(document.readyState === "complete"){
+        let model = { /* Nothing to be added here */};
+        let gallimimus = new Gallimimus();
+        
+        // You need to register your component before loading the page
+        gallimimus.registerComponent("hello", new Component(`
+		<h1>Hello world</h1>
+        `));
+        
+        model = gallimimus.load("app", document, model);
+    }
+});
+```
+
+```html
+<!-- ./index.html -->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <title>My app</title>
+        <script src="./bundle.js"></script>
+    </head>
+    <body id="app">
+        <div data-component="{'name':'hello'}"></div>
+    </body>
+</html>
+```
+
+Here is the most simple example that you can have. You have to declare every component that you want to use before calling the ``load`` method of the Gallimimus instance. When the page will be built, the ``<div>`` element marked with *data-component* will be **replaced** by your custom component. Because of internal reasons, the best practice is to use a ``<div>`` element as holder for the *data-component* directive.
+
+Well, this is good but can we go further with this component system ? Let's try to give it a some data :
+
+```js
+// ./index.js
+// ...
+let model = { user:{ firstname: "Pol", lastname:"Lefèvre" } };
+// ...
+gallimimus.registerComponent("hello", new Component(`
+	<h1>Hello <span data-bind="{'path':'firstname'}"></span>
+	    <span data-bind="{'path':'lastname'}"></span>
+    </h1>
+`));
+// ...
+```
+
+```html
+<!-- ./index.html -->
+<!-- ... -->
+<div data-component="{'name':'hello', 'path':'user'}"></div>
+<!-- ... -->
+```
+
+Here, we added a *path* attribute to the *data-component* directive. It sets the data root of the component to be ``model.user``. It means that if you try to access a property (through data-binding for example), it will be **relative** to the *path* that you gave to the *data-component* (in this example, the resulting paths will be: `model.user.firstname` and ``model.user.lastname``).
+
+This is the biggest strength of components : you can plug them anywhere in your model as long as they can find properties that they want to use. On the other hand, you may want to show the same data in different ways. Then you can use different components that will be able to access the same properties but that will make use of them differently.
+
+Obviously, you can use every directive that you want inside of your component, even another component. You just need to be cautious about the relative paths.
+
+#### Syntax
+
+#### Notes
+
+* If you do not precise any *path*, the data root will be your model
+* It is a best practice to make your component path as deep as possible to improve readability and reusability
 
 ## Understanding Gallimimus
 
