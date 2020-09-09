@@ -58,3 +58,10 @@
   * *data-class*
   * *data-foreach*
 * Code coverage is now > 80%
+
+### 2.0.1 Bugfix: component root replacement
+
+#### Fixed
+
+* The component holder properties are no more injected with component data root.
+

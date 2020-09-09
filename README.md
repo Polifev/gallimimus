@@ -1,6 +1,6 @@
 # @polifev/gallimimus
 
-Gallimimus is a very light library for binding a javascript object (the model) to an html document (the template). It relies on the [on-change](https://www.npmjs.com/package/on-change) module to provide a bidirectional, dirty checking free data binding.
+Gallimimus is a very light library for binding a JavaScript object (the model) to an html document (the template). It relies on the [on-change](https://www.npmjs.com/package/on-change) module to provide a bidirectional, dirty checking free data binding.
 
 ## Quick start
 
@@ -259,7 +259,7 @@ It is not the only way to use *data-class*. Let's take another example :
 </style>
 ```
 
-Here, we decided to toggle a defined class based on the value of a boolean-like property. This code will toggle a green outline around ``<input/>`` that contains a non-empty value. This can do the job but it's not very elegant. A good improvement here would be to create a computed property ``firstnameIsOk`` with the javascript *get* operator that returns for example ``this.firstname.length >= 3`` and bind this to our class :
+Here, we decided to toggle a defined class based on the value of a boolean-like property. This code will toggle a green outline around ``<input/>`` that contains a non-empty value. This can do the job but it's not very elegant. A good improvement here would be to create a computed property ``firstnameIsOk`` with the JavaScript  *get* operator that returns for example ``this.firstname.length >= 3`` and bind this to our class :
 
 ```
 <div>
@@ -420,7 +420,7 @@ document.addEventListener("readystatechange", () =>{
 </html>
 ```
 
-Here is the most simple example that you can have. You have to declare every component that you want to use before calling the ``load`` method of the Gallimimus instance. When the page will be built, the ``<div>`` element marked with *data-component* will be **replaced** by your custom component. Because of internal reasons, the best practice is to use a ``<div>`` element as holder for the *data-component* directive.
+Here is the most simple example that you can have. You have to declare every component that you want to use before calling the ``load`` method of the Gallimimus instance. When the page will be built, the ``<div>`` element marked with *data-component* will be **replaced** by your custom component. Because of internal reasons, the best practice is to use a ``<div>`` element as holder for the *data-component* directive. Note that every data-* special attribute attached to the holder will be transmitted to the component (ex: *data-foreach* for duplicating the component).
 
 Well, this is good but can we go further with this component system ? Let's try to give it a some data :
 
@@ -448,14 +448,155 @@ Here, we added a *path* attribute to the *data-component* directive. It sets the
 
 This is the biggest strength of components : you can plug them anywhere in your model as long as they can find properties that they want to use. On the other hand, you may want to show the same data in different ways. Then you can use different components that will be able to access the same properties but that will make use of them differently.
 
-Obviously, you can use every directive that you want inside of your component, even another component. You just need to be cautious about the relative paths.
+Obviously, you can use every directive that you want inside of your component, even another component. You just need to be cautious about the relative paths. Here is a more complex and complete example in [this section](#detailed-example).
 
 #### Syntax
 
+| Property | Description                                 | Default value |
+| :------- | :------------------------------------------ | :------------ |
+| ``name`` | The name of a registered component          | *Mandatory*   |
+| ``path`` | The path to the data root of your component | ``""``        |
+
+#### Detailed example
+
+First, we need to define our model class. For this, we'll create a new folder "model" and create a file "User.js" in it :
+
+```javascript
+// ./model/User.js
+class User{
+    constructor(firstname, lastname, role){
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.role = role;
+    }
+}
+
+module.exports.User = User;
+```
+
+Then, we need to define the components that will show this data. Create another folder "components" and create a file "UserCard.js" in it :
+
+```javascript
+// ./components/UserCard.js
+const { Component } = require("@polifev/gallimimus");
+class UserCard extends Component{
+    constructor(){
+        super(`
+        <div class="user-card">
+            <div data-bind="{'path':'role'}" data-class="{'path':'role'}"></div>
+            <hr/>
+            <div data-bind="{'path':'firstname'}"></div> 
+            <div data-bind="{'path':'lastname'}"></div>
+        </div>
+        `);
+    }
+}
+module.exports.UserCard = UserCard;
+```
+
+It is the recommended way of separating the declaration of our components from the *index.js* file. Create another component file "UsersList.js" :
+
+```javascript
+// ./components/UsersList.js
+const {Component} = require("@polifev/gallimimus");
+class UsersList extends Component{
+    constructor(){
+        super(`
+        <div class="list">
+            <div data-foreach="{'path':'users'}" data-component="{'name':'user-card','path':'$elt'}"></div>
+        </div>
+        `);
+    }
+}
+module.exports.UsersList = UsersList;
+```
+
+We are now ready to configure Gallimimus to use our components. Put this into your *index.js* file :
+
+```javascript
+// ./index.js
+const { Gallimimus } = require("@polifev/gallimimus");
+const { UserCard } = require("./components/UserCard");
+const { User } = require("./model/User");
+const { UsersList } = require("./components/UsersList");
+
+document.addEventListener("readystatechange", () =>{
+    if(document.readyState === "complete"){
+        let model = {
+            users:[
+                new User("Pol", "Lefèvre", "admin"),
+                new User("John", "Doe", "moderator"),
+                new User("Jack", "Foo", "user"),
+                new User("Tery", "Bar", "user")
+            ]
+        };
+        let gallimimus = new Gallimimus();
+        
+        // You need to register your component before loading the page
+        gallimimus.registerComponent("user-card", new UserCard());
+        gallimimus.registerComponent("users-list", new UsersList());
+        
+        model = gallimimus.load("app", document, model);
+    }
+});
+```
+
+Now, we can create our main template file and add style to it (For practical purpose, I put the styling into the html file but you can extract it in a .css file) Put this into your *index.html* file :
+
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Test page</title>
+        <script src="./bundle.js"></script>
+    </head>
+    <body id="app">
+        <div data-component="{'name':'users-list'}"></div>
+    </body>
+</html>
+<style>
+    .admin{
+        color: red;
+    }
+    .moderator{
+        color: greenyellow;
+    }
+    .user{
+        color: grey;
+    }
+
+    .user-card{
+        display: flex;
+        flex-direction: column;
+        border: 1px solid black;
+        padding: 6px;
+        margin: 6px;
+        min-width: 150px;
+        max-width: 150px;
+    }
+
+    .list{
+        display:flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+</style>
+```
+
+Don't forget to browserify your *index.js* if you want to try it in your browser.
+
 #### Notes
 
-* If you do not precise any *path*, the data root will be your model
-* It is a best practice to make your component path as deep as possible to improve readability and reusability
+From the examples above, you can note several things :
+
+* You can use JavaScript classes in your model instead of writing a complex object directly in *index.js*.
+* You can nest components into other components without any pain.
+* You can separate components registration from their definitions by extending the *Component* class.
+* You can reduce the size of your *index.html* by having a root component that holds your app.
+
+* If you do not precise any *path*, the data root will be your entire model
+* It is a best practice to make your component path as deep as possible to improve readability and reusability of your components
 
 ## Understanding Gallimimus
 

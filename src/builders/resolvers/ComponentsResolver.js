@@ -31,18 +31,19 @@ class ComponentsResolver extends AbstractDirectiveResolver {
 	_deployComponent(templateElement, componentName, dataRoot) {
 		templateElement.innerHTML = this._componentsLibrary[componentName].template;
 		let element = templateElement.firstChild;
-		this._customAttributes.forEach(attributeName => {
-			this._copyAttributes(attributeName, templateElement, element);
-		});
-
-		templateElement.parentElement.insertBefore(element, templateElement);
-		templateElement.parentElement.removeChild(templateElement);
 
 		if (dataRoot !== null && dataRoot !== "") {
 			this._customAttributes.forEach(attribute => {
 				this._inject(attribute, element, dataRoot);
 			});
 		}
+
+		this._customAttributes.forEach(attributeName => {
+			this._copyAttributes(attributeName, templateElement, element);
+		});
+
+		templateElement.parentElement.insertBefore(element, templateElement);
+		templateElement.parentElement.removeChild(templateElement);
 		element.removeAttribute("data-component");
 	}
 
