@@ -64,6 +64,7 @@ class Gallimimus {
 			}
 		}, 100);
 		this.reload(appRootId, document);
+		return watchedModel;
 	}
 
 	registerComponent(name, component) {
