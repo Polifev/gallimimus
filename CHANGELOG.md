@@ -59,9 +59,15 @@
   * *data-foreach*
 * Code coverage is now > 80%
 
-### 2.0.1 Bugfix: component root replacement
+### 2.0.1 Patch: component root replacement
 
 #### Fixed
 
 * The component holder properties are no more injected with component data root.
 
+### 2.0.2 Patch: model return
+
+#### Fixed
+
+* The observed model is now returned by the *load* function of the *Gallimimus* object
+* The feature above is slightly tested
