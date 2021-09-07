@@ -1,4 +1,4 @@
-class ModelProxy {
+class ModelTrap {
     constructor(path){
         this._path = path;
         this.onPropertyChanged = () => {};
@@ -7,9 +7,8 @@ class ModelProxy {
     get(target, propertyName){
         if(typeof target[propertyName] === "object" && target[propertyName] !== null){
             let subPath = buildPath(this._path, propertyName);
-            let trap =  new ModelProxy(subPath);
+            let trap =  new ModelTrap(subPath);
             trap.onPropertyChanged = this.onPropertyChanged;
-            // eslint-disable-next-line no-undef
             return new Proxy(target[propertyName], trap);
         } else {
             return target[propertyName];
@@ -30,4 +29,4 @@ function buildPath(root, name){
     return root + name;
 }
 
-module.exports.ModelProxy = ModelProxy;
+module.exports.ModelTrap = ModelTrap;

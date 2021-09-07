@@ -8,10 +8,7 @@ const { Component } = require("./Component");
 const { ClassResolver } = require("./builders/resolvers/ClassResolver");
 const ACTION_EVENTS = require("./EventsList");
 const INPUT_EVENTS = ["input"];
-//const onChange = require("on-change");
-const { ModelProxy } = require("./ModelProxy");
-
-//const { ModelProxy } = require("./ModelProxy");
+const { ModelTrap } = require("./ModelTrap");
 
 class Gallimimus {
 	constructor() {
@@ -32,36 +29,19 @@ class Gallimimus {
 		let root = document.getElementById(appRootId);
 		let rootClone = root.cloneNode(true);
 
-		let modelTrap = new ModelProxy("");
-		// eslint-disable-next-line no-undef
+		let modelTrap = new ModelTrap("");
 		let modelProxy = new Proxy(model, modelTrap);
 		modelTrap.onPropertyChanged = (path, value) => {
 			self._bindResolver.modelChanged(modelProxy, path);
 			self._classResolver.modelChanged(modelProxy, path);
-			if(typeof value === "object"){
+			if(typeof value === "object" || path.endsWith("length")){
 				self._reloadNeeded = true;
 			}
 		};
 		if(modelProxy.init){
 			modelProxy.init();
 		}
-
-		// eslint-disable-next-line no-unused-vars
-		/*let watchedModel = onChange(model, function (path, value, previousValue, name) {
-			self._bindResolver.modelChanged(watchedModel, path);
-			self._classResolver.modelChanged(watchedModel, path);
-
-			// TODO ask each resolver if reload is needed
-			if (typeof value !== "string") {
-				self._reloadNeeded = true;
-			}
-		});
-
-		if (watchedModel.init) {
-			watchedModel.init();
-		}*/
 		this._reloadNeeded = false;
-
 
 		this._builder = new HtmlBuilder(modelProxy, rootClone)
 			.withDirectiveResolver(this._componentsResolver)

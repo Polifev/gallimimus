@@ -1,19 +1,18 @@
 const assert = require("assert");
-const { ModelProxy } = require("../src/ModelProxy");
+const { ModelTrap } = require("../src/ModelTrap");
 
-describe("ModelProxy", () => {
+describe("ModelTrap", () => {
     it("detects changes on object fields", () => {
         let obj = {
             a: 0
         };
         let catchedPath = null;
         let catchedValue = null;
-        let trap = new ModelProxy("");
+        let trap = new ModelTrap("");
         trap.onPropertyChanged = (path, value) => {
             catchedPath = path;
             catchedValue = value;
         };
-        // eslint-disable-next-line no-undef
         let prox = new Proxy(obj, trap);
         prox.a = 1;
         assert.strictEqual(catchedPath, "a");
@@ -24,12 +23,10 @@ describe("ModelProxy", () => {
         let obj = {
             a: 0
         };
-        let trap = new ModelProxy("");
-        // eslint-disable-next-line no-unused-vars
-        trap.onPropertyChanged = (path, value) => {
+        let trap = new ModelTrap("");
+        trap.onPropertyChanged = () => {
             // do nothing
         };
-        // eslint-disable-next-line no-undef
         let prox = new Proxy(obj, trap);
         prox.a = 1;
         assert.strictEqual(prox.a, 1);
@@ -43,12 +40,11 @@ describe("ModelProxy", () => {
         };
         let catchedPath = null;
         let catchedValue = null;
-        let trap = new ModelProxy("");
+        let trap = new ModelTrap("");
         trap.onPropertyChanged = (path, value) => {
             catchedPath = path;
             catchedValue = value;
         };
-        // eslint-disable-next-line no-undef
         let prox = new Proxy(obj, trap);
         prox.a.b = 1;
         assert.strictEqual(catchedPath, "a.b");
@@ -67,14 +63,12 @@ describe("ModelProxy", () => {
         let obj = new Clazz();
         let catchedPath = null;
         let catchedValue = null;
-        let trap = new ModelProxy("");
+        let trap = new ModelTrap("");
         trap.onPropertyChanged = (path, value) => {
             catchedPath = path;
             catchedValue = value;
         };
-        // eslint-disable-next-line no-undef
         let prox = new Proxy(obj, trap);
-        //obj.change();
         prox.change();
         assert.strictEqual(catchedPath, "prop");
         assert.strictEqual(catchedValue, 1);
@@ -86,13 +80,12 @@ describe("ModelProxy", () => {
         };
         let catchedPath = null;
         let catchedValue = null;
-        let trap = new ModelProxy("");
+        let trap = new ModelTrap("");
         trap.onPropertyChanged = (path, value) => {
             catchedPath = path;
             catchedValue = value;
         };
 
-        // eslint-disable-next-line no-undef
         let prox = new Proxy(obj, trap);
         prox.arr[0] = 0;
 
@@ -105,13 +98,11 @@ describe("ModelProxy", () => {
             arr: [1, 2, 3, 4]
         };
         let catchedPaths = [];
-        let trap = new ModelProxy("");
-        // eslint-disable-next-line no-unused-vars
-        trap.onPropertyChanged = (path, value) => {
+        let trap = new ModelTrap("");
+        trap.onPropertyChanged = (path) => {
             catchedPaths.push(path);
         };
 
-        // eslint-disable-next-line no-undef
         let prox = new Proxy(obj, trap);
         prox.arr.push(5);
 
@@ -123,10 +114,9 @@ describe("ModelProxy", () => {
         let obj = {
             subobj: {prop: 10}
         };
-        // eslint-disable-next-line no-unused-vars
         let catchedPath = null;
         let catchedValue = null;
-        let trap = new ModelProxy("");
+        let trap = new ModelTrap("");
         trap.onPropertyChanged = (path, value) => {
             console.log(path);
             console.log(value);
@@ -134,7 +124,6 @@ describe("ModelProxy", () => {
             catchedValue = value;
         };
 
-        // eslint-disable-next-line no-undef
         let prox = new Proxy(obj, trap);
         prox.subobj = { prop: 15};
 

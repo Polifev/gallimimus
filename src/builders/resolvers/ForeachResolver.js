@@ -34,7 +34,6 @@ class ForeachResolver extends AbstractDirectiveResolver {
 		let fragment = element.cloneNode(true);
 		fragment.removeAttribute("data-foreach");
 
-
 		for (let i = 0; i < list.length; i++) {
 			let clone = fragment.cloneNode(true);
 			parent.insertBefore(clone, element);
