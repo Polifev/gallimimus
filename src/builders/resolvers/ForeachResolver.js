@@ -11,6 +11,7 @@ class ForeachResolver extends AbstractDirectiveResolver {
 	constructor() {
 		super();
 		this._customAttributes = ["data-bind", "data-action", "data-if", "data-else", "data-foreach", "data-class"];
+		this._watchedArrays = [];
 	}
 
 	resolve(node, model) {
@@ -21,10 +22,22 @@ class ForeachResolver extends AbstractDirectiveResolver {
 				let binding = this._parse(dataForeachAttribute);
 				if (!binding.path.includes(ELEMENT_MARKER)) {
 					this._duplicateElement(element, model, binding.path);
+					if (!this._watchedArrays.includes(binding.path)) {
+						this._watchedArrays.push(binding.path);
+					}
 				}
 			});
 			this.resolve(node, model);
 		}
+	}
+
+	modelChanged(model, path, oldValue, newValue) {
+		// Look for a watched array whose length could have changed
+		if (path.endsWith("length") && oldValue != newValue) {
+			let arrPath = path.substring(0, path.lastIndexOf("."));
+			return this._watchedArrays.includes(arrPath);
+		}
+		return false;
 	}
 
 	_duplicateElement(element, model, dataForeachAttribute) {

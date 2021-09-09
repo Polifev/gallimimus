@@ -32,6 +32,7 @@ class ClassResolver extends AbstractDirectiveResolver {
 
 	modelChanged(model, path) {
 		this._passiveListeners.forEach(l => l(model, path));
+		return false;
 	}
 
 	_parse(attribute) {

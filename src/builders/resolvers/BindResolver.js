@@ -40,25 +40,26 @@ class BindResolver extends AbstractDirectiveResolver {
 		this._activeListeners.forEach(l => l(e));
 	}
 
-	modelChanged(model, path) {
+	modelChanged(model, path, oldValue, newValue) {
 		this._passiveListeners.forEach(l => l(model, path));
+		return false;
 	}
 
 	_parse(attribute) {
-		try{
-            attribute = attribute.replace(/'/g, "\"");
-            let parsed = JSON.parse(attribute);
-            let bindings = Array.isArray(parsed) ? parsed : [parsed];
-            bindings.map(binding => {
+		try {
+			attribute = attribute.replace(/'/g, "\"");
+			let parsed = JSON.parse(attribute);
+			let bindings = Array.isArray(parsed) ? parsed : [parsed];
+			bindings.map(binding => {
 				binding.mode = binding.mode || "oneway";
 				binding.bindTo = binding.bindTo || "innerHTML";
-                binding.args = binding.args || [];
-                return binding;
-            });
-            return bindings;
-        } catch(e){
-            throw new Error(`Invalid format: ${attribute}`);
-        }
+				binding.args = binding.args || [];
+				return binding;
+			});
+			return bindings;
+		} catch (e) {
+			throw new Error(`Invalid format: ${attribute}`);
+		}
 	}
 
 	_apply(element, model, binding) {

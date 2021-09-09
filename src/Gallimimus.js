@@ -19,6 +19,15 @@ class Gallimimus {
 		this._actionsResolver = new ActionsResolver();
 		this._classResolver = new ClassResolver();
 
+		this.resolvers = [
+			this._componentsResolver,
+			this._foreachResolver,
+			this._ifElseResolver,
+			this._bindResolver,
+			this._actionsResolver,
+			this._classResolver
+		];
+
 		this._reloadNeeded = false;
 		this._builder = null;
 	}
@@ -31,14 +40,12 @@ class Gallimimus {
 
 		let modelTrap = new ModelTrap("");
 		let modelProxy = new Proxy(model, modelTrap);
-		modelTrap.onPropertyChanged = (path, value) => {
-			self._bindResolver.modelChanged(modelProxy, path);
-			self._classResolver.modelChanged(modelProxy, path);
-			if(typeof value === "object" || path.endsWith("length")){
-				self._reloadNeeded = true;
+		modelTrap.onPropertyChanged = (path, oldValue, newValue) => {
+			for (let i = 0; i < self.resolvers.length; i++) {
+				self._reloadNeeded |= self.resolvers[i].modelChanged(modelProxy, path, oldValue, newValue);
 			}
 		};
-		if(modelProxy.init){
+		if (modelProxy.init) {
 			modelProxy.init();
 		}
 		this._reloadNeeded = false;
