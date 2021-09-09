@@ -33,7 +33,7 @@ class ForeachResolver extends AbstractDirectiveResolver {
 
 	modelChanged(model, path, oldValue, newValue) {
 		// Look for a watched array whose length could have changed
-		if (path.endsWith("length") && oldValue != newValue) {
+		if (path.endsWith("length")) {
 			let arrPath = path.substring(0, path.lastIndexOf("."));
 			return this._watchedArrays.includes(arrPath);
 		}
