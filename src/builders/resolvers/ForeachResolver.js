@@ -31,6 +31,7 @@ class ForeachResolver extends AbstractDirectiveResolver {
 		}
 	}
 
+	// eslint-disable-next-line no-unused-vars
 	modelChanged(model, path, oldValue, newValue) {
 		// Look for a watched array whose length could have changed
 		let parentReplaced = this._watchedArrays.reduce((found, watched) => found |= watched.startsWith(path), false);
