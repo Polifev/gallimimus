@@ -118,8 +118,6 @@ describe("ModelTrap", () => {
 		let catchedValue = null;
 		let trap = new ModelTrap("");
 		trap.onPropertyChanged = (path, oldValue, value) => {
-			console.log(path);
-			console.log(value);
 			catchedPath = path;
 			catchedValue = value;
 		};
