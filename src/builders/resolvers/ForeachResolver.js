@@ -11,6 +11,7 @@ class ForeachResolver extends AbstractDirectiveResolver {
 	constructor() {
 		super();
 		this._customAttributes = ["data-bind", "data-action", "data-if", "data-else", "data-foreach", "data-class"];
+		this._watchedArrays = [];
 	}
 
 	resolve(node, model) {
@@ -21,9 +22,26 @@ class ForeachResolver extends AbstractDirectiveResolver {
 				let binding = this._parse(dataForeachAttribute);
 				if (!binding.path.includes(ELEMENT_MARKER)) {
 					this._duplicateElement(element, model, binding.path);
+					if (!this._watchedArrays.includes(binding.path)) {
+						this._watchedArrays.push(binding.path);
+					}
 				}
 			});
 			this.resolve(node, model);
+		}
+	}
+
+	// eslint-disable-next-line no-unused-vars
+	modelChanged(model, path, oldValue, newValue) {
+		// Look for a watched array whose length could have changed
+		let parentReplaced = this._watchedArrays.reduce((found, watched) => found |= watched.startsWith(path), false);
+		if (parentReplaced) {
+			return true;
+		} else if (path.endsWith("length")) {
+			let arrPath = path.substring(0, path.lastIndexOf("."));
+			return this._watchedArrays.includes(arrPath);
+		} else {
+			return false;
 		}
 	}
 
@@ -33,7 +51,6 @@ class ForeachResolver extends AbstractDirectiveResolver {
 		let parent = element.parentElement;
 		let fragment = element.cloneNode(true);
 		fragment.removeAttribute("data-foreach");
-
 
 		for (let i = 0; i < list.length; i++) {
 			let clone = fragment.cloneNode(true);

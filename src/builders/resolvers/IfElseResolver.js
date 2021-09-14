@@ -2,11 +2,22 @@ const { findProperty } = require("../../Util");
 const { AbstractDirectiveResolver } = require("./AbstractDirectiveResolver");
 
 class IfElseResolver extends AbstractDirectiveResolver {
+	
+	constructor(){
+		super();
+		this._watchedProperties = [];
+	}
+
 	resolve(node, model) {
 		let elements = node.querySelectorAll("[data-if]");
 		elements.forEach(element => {
 			let attribute = element.getAttribute("data-if");
 			let binding = this._parse(attribute);
+			
+			if(!this._watchedProperties.includes(binding.path)){
+				this._watchedProperties.push(binding.path);
+			}
+
 			let prop = findProperty(model, binding.path);
 			if (!IfElseResolver.evaluateProp(prop)) {
 				element.parentElement.removeChild(element);
@@ -24,6 +35,14 @@ class IfElseResolver extends AbstractDirectiveResolver {
 			}
 			element.removeAttribute("data-else");
 		});
+	}
+
+	// eslint-disable-next-line no-unused-vars
+	modelChanged(model, propertyName, oldValue, newValue) {
+		let mustRebuild = this._watchedProperties.reduce((acc, path) => {
+			acc |= path.startsWith(propertyName);
+		}, false);
+		return mustRebuild;
 	}
 
 	_parse(attribute){

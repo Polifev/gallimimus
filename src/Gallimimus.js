@@ -8,7 +8,7 @@ const { Component } = require("./Component");
 const { ClassResolver } = require("./builders/resolvers/ClassResolver");
 const ACTION_EVENTS = require("./EventsList");
 const INPUT_EVENTS = ["input"];
-const onChange = require("on-change");
+const { ModelTrap } = require("./ModelTrap");
 
 class Gallimimus {
 	constructor() {
@@ -18,6 +18,15 @@ class Gallimimus {
 		this._bindResolver = new BindResolver();
 		this._actionsResolver = new ActionsResolver();
 		this._classResolver = new ClassResolver();
+
+		this.resolvers = [
+			this._componentsResolver,
+			this._foreachResolver,
+			this._ifElseResolver,
+			this._bindResolver,
+			this._actionsResolver,
+			this._classResolver
+		];
 
 		this._reloadNeeded = false;
 		this._builder = null;
@@ -29,24 +38,19 @@ class Gallimimus {
 		let root = document.getElementById(appRootId);
 		let rootClone = root.cloneNode(true);
 
-		// eslint-disable-next-line no-unused-vars
-		let watchedModel = onChange(model, function (path, value, previousValue, name) {
-			self._bindResolver.modelChanged(watchedModel, path);
-			self._classResolver.modelChanged(watchedModel, path);
-
-			// TODO ask each resolver if reload is needed
-			if (typeof value !== "string") {
-				self._reloadNeeded = true;
+		let modelTrap = new ModelTrap("");
+		let modelProxy = new Proxy(model, modelTrap);
+		modelTrap.onPropertyChanged = (path, oldValue, newValue) => {
+			for (let i = 0; i < self.resolvers.length; i++) {
+				self._reloadNeeded |= self.resolvers[i].modelChanged(modelProxy, path, oldValue, newValue);
 			}
-		});
-
-		if (watchedModel.init) {
-			watchedModel.init();
+		};
+		if (modelProxy.init) {
+			modelProxy.init();
 		}
 		this._reloadNeeded = false;
 
-
-		this._builder = new HtmlBuilder(watchedModel, rootClone)
+		this._builder = new HtmlBuilder(modelProxy, rootClone)
 			.withDirectiveResolver(this._componentsResolver)
 			.withDirectiveResolver(this._foreachResolver)
 			.withDirectiveResolver(this._ifElseResolver)
@@ -64,7 +68,7 @@ class Gallimimus {
 			}
 		}, 100);
 		this.reload(appRootId, document);
-		return watchedModel;
+		return modelProxy;
 	}
 
 	registerComponent(name, component) {

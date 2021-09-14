@@ -94,4 +94,48 @@ describe("ForeachResolver", () => {
 
 		assert.equal(global.document.getElementsByClassName("nickname").length, 5);
 	});
+
+	it("need rebuild if array length changes", () => {
+		let model = {
+			users: [
+				{ firstname: "Pol", lastname: "Lefèvre", nicknames: [] }
+			]
+		};
+		let resolver = new ForeachResolver();
+		resolver.resolve(global.document.getElementById("app"), model);
+		assert.strictEqual(resolver.modelChanged(model, "users.0.nicknames.length", 1, 2), true);
+	});
+
+	it("need rebuild if array changes", () => {
+		let model = {
+			users: [
+				{ firstname: "Pol", lastname: "Lefèvre", nicknames: [] }
+			]
+		};
+		let resolver = new ForeachResolver();
+		resolver.resolve(global.document.getElementById("app"), model);
+		assert.strictEqual(resolver.modelChanged(model, "users.0.nicknames", [], []), true);
+	});
+
+	it("need rebuild if array's parent changes", () => {
+		let model = {
+			users: [
+				{ firstname: "Pol", lastname: "Lefèvre", nicknames: [] }
+			]
+		};
+		let resolver = new ForeachResolver();
+		resolver.resolve(global.document.getElementById("app"), model);
+		assert.strictEqual(resolver.modelChanged(model, "users.0", null, null), true);
+	});
+
+	it("doesn't need rebuild if array element changes", () => {
+		let model = {
+			users: [
+				{ firstname: "Pol", lastname: "Lefèvre", nicknames: [] }
+			]
+		};
+		let resolver = new ForeachResolver();
+		resolver.resolve(global.document.getElementById("app"), model);
+		assert.strictEqual(resolver.modelChanged(model, "users.0.nicknames.0", null, null), false);
+	});
 });
