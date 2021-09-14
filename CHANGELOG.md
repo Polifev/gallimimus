@@ -71,3 +71,10 @@
 
 * The observed model is now returned by the *load* function of the *Gallimimus* object
 * The feature above is slightly tested
+
+### 2.0.3 Patch: rebuild less
+
+#### Fixed
+
+* The *data-foreach* and *data-if*/*data-else* directives have been a bit optimized to avoid useless page rebuilds
+* The feature above is slightly tested
