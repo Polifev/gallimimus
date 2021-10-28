@@ -41,7 +41,7 @@ class ClassResolver extends AbstractDirectiveResolver {
 			let parsed = JSON.parse(attribute);
 			let bindings = Array.isArray(parsed) ? parsed : [parsed];
 			bindings.map(binding => {
-				binding.mode = binding.mode || "text";
+				binding.mode = binding.mode || ClassMode.TEXT;
 				binding.args = binding.args || [];
 				binding.removeOldClass = function () { };
 				return binding;
@@ -50,27 +50,6 @@ class ClassResolver extends AbstractDirectiveResolver {
 		} catch (e) {
 			throw new Error(`Invalid format: ${attribute}`);
 		}
-
-		/*
-		let result = [];
-		let bindingStrings = attribute.split(";");
-		bindingStrings.forEach(bindingString => {
-			let parts = bindingString.split(",");
-			let binding = {
-				path: parts[0],
-				mode: parts[1] || ClassMode.TEXT,
-				className: parts[2] || "",
-				computeParts: [],
-				removeOldClass: function () { }
-			};
-			let start = binding.mode == ClassMode.TEXT ? 2 : 3;
-			for (let i = start; i < parts.length; i++) {
-				binding.args.push(parts[i]);
-			}
-			result.push(binding);
-		});
-		return result;
-		*/
 	}
 
 	_apply(element, model, binding) {
