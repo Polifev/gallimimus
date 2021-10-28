@@ -204,4 +204,26 @@ describe("ActionsResolver", () => {
 		global.document.getElementById("argsButton").dispatchEvent(evt1);
 		assert.deepEqual(r, [17, 7, 19]);
 	});
+
+	it("get event args as last argument of callback", () => {
+		let target = 0;
+		let model = {
+			x: [7, 2, 8],
+			z: { add: 3, multiply: 2 },
+			foo(e) {
+				target = e.target;
+			}
+		};
+
+		let resolver = new ActionsResolver();
+		resolver.resolve(global.document.getElementById("app"), model);
+		global.document.addEventListener("click", e => resolver.userAction(e));
+		global.document.addEventListener("change", e => resolver.userAction(e));
+
+		let evt1 = global.document.createEvent("MouseEvent");
+		evt1.initEvent("click", true, false);
+		let btnElement = global.document.getElementById("btn");
+		btnElement.dispatchEvent(evt1);
+		assert.equal(target, btnElement);
+	});
 });
