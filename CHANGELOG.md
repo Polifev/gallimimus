@@ -79,7 +79,7 @@
 * The *data-foreach* and *data-if*/*data-else* directives have been a bit optimized to avoid useless page rebuilds
 * The feature above is slightly tested
 
-### 2.0.4 Patch
+### 2.0.4 Patch: lost focus
 
 * The *data-action* directive has been modified to automatically add its event-args to its bound callback function
 * The input that was focused before a document rebuild will now be re-focused automatically after rebuild (it needs an ID)
