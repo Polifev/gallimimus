@@ -12,6 +12,7 @@ class HtmlBuilder {
 	constructor(model, htmlTemplate) {
 		this._model = model;
 		this._htmlTemplate = htmlTemplate;
+		this._rootNode = undefined;
 		this._directivesResolvers = [];
 	}
 
@@ -30,12 +31,26 @@ class HtmlBuilder {
 	 * Construct an html document from the template and data using the given
 	 * directive resolvers.
 	 */
-	buildDocument() {
-		let node = this._htmlTemplate.cloneNode(true);
+	buildDocument(document, appRootId) {
+		let root = document.getElementById(appRootId);
+		let focusedElementId = document.activeElement.id;
+
+		this._rootNode = this._htmlTemplate.cloneNode(true);
 		this._directivesResolvers.forEach(r => {
-			r.resolve(node, this._model);
+			r.resolve(this._rootNode, this._model);
 		});
-		return node;
+
+		root.parentElement.insertBefore(this._rootNode, root);
+		root.parentElement.removeChild(root);
+		
+		if(focusedElementId !== undefined){
+			let newFocus = document.getElementById(focusedElementId);
+			if(newFocus){
+				newFocus.focus();
+			}
+		}
+		
+		return this._rootNode;
 	}
 }
 

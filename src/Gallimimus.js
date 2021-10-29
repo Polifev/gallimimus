@@ -77,11 +77,7 @@ class Gallimimus {
 
 	reload(appRootId, document) {
 		console.log("(Re-)Building");
-		let node = this._builder.buildDocument();
-
-		let root = document.getElementById(appRootId);
-		root.parentElement.insertBefore(node, root);
-		root.parentElement.removeChild(root);
+		this._builder.buildDocument(document, appRootId);
 	}
 }
 
