@@ -82,4 +82,4 @@
 ### 2.0.4 Patch
 
 * The *data-action* directive has been modified to automatically add its event-args to its bound callback function
-* The input that was focused before a document rebuild will now be refocused automatically
+* The input that was focused before a document rebuild will now be re-focused automatically after rebuild (it needs an ID)

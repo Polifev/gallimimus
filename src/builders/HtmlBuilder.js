@@ -33,8 +33,7 @@ class HtmlBuilder {
 	 */
 	buildDocument(document, appRootId) {
 		let root = document.getElementById(appRootId);
-		let focusedElement = document.activeElement;
-		let focusedElementPath = childPath(focusedElement, this._rootNode);
+		let focusedElementId = document.activeElement.id;
 
 		this._rootNode = this._htmlTemplate.cloneNode(true);
 		this._directivesResolvers.forEach(r => {
@@ -44,48 +43,15 @@ class HtmlBuilder {
 		root.parentElement.insertBefore(this._rootNode, root);
 		root.parentElement.removeChild(root);
 		
-		if(focusedElementPath !== null){
-			getElementByPath(this._rootNode, focusedElementPath).focus();
+		if(focusedElementId !== undefined){
+			let newFocus = document.getElementById(focusedElementId);
+			if(newFocus){
+				newFocus.focus();
+			}
 		}
 		
 		return this._rootNode;
 	}
-}
-
-function childPath(node, rootNode){
-	let result;
-	if(node.parentElement == null){
-		result = null;
-	}
-	else if(node == rootNode){
-		result = [];
-	} else {
-		let path = childPath(node.parentElement, rootNode);
-		if(path == null){
-			result = null;
-		} else {
-			path.push(childIndex(node));
-			result = path;
-		}
-	}
-	return result;
-}
-
-function childIndex(node){
-	let ch = node.parentElement.children;
-	for(let i = 0; i < ch.length; i++){
-		if(ch[i] === node){
-			return i;
-		}
-	}
-}
-
-function getElementByPath(root, path){
-	let current = root;
-	path.forEach(index => {
-		current = current.children[index];
-	});
-	return current;
 }
 
 module.exports.HtmlBuilder = HtmlBuilder;
